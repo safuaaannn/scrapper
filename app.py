@@ -10,7 +10,7 @@ import json
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 
-# Import scraper functions
+# Import from the scraper package
 from scraper import scrape_url
 
 app = Flask(__name__)
@@ -41,27 +41,36 @@ def api_scrape():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
+    async def run_all():
+        from playwright.async_api import async_playwright
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            clean_urls = [u.strip() for u in urls if u.strip()]
+            task_results = await asyncio.gather(
+                *[scrape_url(u, browser=browser) for u in clean_urls],
+                return_exceptions=True,
+            )
+            await browser.close()
+            return list(zip(clean_urls, task_results))
+
     try:
-        for url in urls:
-            url = url.strip()
-            if not url:
-                continue
-            try:
-                df = loop.run_until_complete(scrape_url(url))
-                if df.empty:
-                    errors.append({"url": url, "error": "No size chart data found."})
-                else:
-                    # Convert DataFrame to list of dicts (replace NaN with None for valid JSON)
-                    df = df.fillna("")
-                    records = df.to_dict(orient="records")
-                    results.append({
-                        "url": url,
-                        "product": records[0].get("Product", "") if records else "",
-                        "data": records,
-                        "columns": list(df.columns),
-                    })
-            except Exception as e:
-                errors.append({"url": url, "error": str(e)})
+        url_results = loop.run_until_complete(run_all())
+        for url, result in url_results:
+            if isinstance(result, Exception):
+                errors.append({"url": url, "error": str(result)})
+            elif result.empty:
+                errors.append({"url": url, "error": "No size chart data found."})
+            else:
+                df = result.fillna("")
+                records = df.to_dict(orient="records")
+                results.append({
+                    "url": url,
+                    "product": records[0].get("Product", "") if records else "",
+                    "data": records,
+                    "columns": list(df.columns),
+                })
+    except Exception as e:
+        errors.append({"url": "all", "error": str(e)})
     finally:
         loop.close()
 

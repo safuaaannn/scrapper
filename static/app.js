@@ -16,13 +16,23 @@ function getStoreFromUrl(url) {
         if (host.includes("theloom.in")) return "theloom";
         if (host.includes("outdoorvoices.com")) return "outdoorvoices";
         if (host.includes("goodamerican.com")) return "goodamerican";
+        // For unknown stores, extract a short name from the domain
         return "unknown";
     } catch {
         return "unknown";
     }
 }
 
-function getStoreLabel(store) {
+function getStoreDomain(url) {
+    try {
+        const host = new URL(url).hostname.toLowerCase();
+        return host.replace(/^www\./, '');
+    } catch {
+        return "unknown";
+    }
+}
+
+function getStoreLabel(store, url) {
     const labels = {
         snitch: "Snitch",
         fashionnova: "Fashion Nova",
@@ -34,7 +44,10 @@ function getStoreLabel(store) {
         outdoorvoices: "Outdoor Voices",
         goodamerican: "Good American",
     };
-    return labels[store] || store;
+    if (labels[store]) return labels[store];
+    // For unknown stores, show the domain name
+    if (url) return getStoreDomain(url);
+    return store;
 }
 
 async function startScraping() {
@@ -124,7 +137,7 @@ function renderResults(results) {
 
     results.forEach((result, rIdx) => {
         const store = getStoreFromUrl(result.url);
-        const storeLabel = getStoreLabel(store);
+        const storeLabel = getStoreLabel(store, result.url);
 
         const div = document.createElement("div");
         div.className = "product-result glass-card";

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Size Chart Scraper</title>
-    <meta name="description" content="Scrape size charts from Snitch, Fashion Nova, Libas and more. Paste product URLs and get size data in CM.">
+    <meta name="description" content="Universal size chart scraper. Paste any product URL and get size data in CM.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -23,7 +23,8 @@
                 <span class="logo-icon">📐</span>
                 <h1>Size Chart Scraper</h1>
             </div>
-            <p class="subtitle">Paste product URLs below and get size charts instantly in CM</p>
+            <p class="subtitle">Paste any product URL below and get size charts instantly in CM</p>
+            <p class="subtitle-hint">Works with any store. Optimized scrapers for:</p>
             <div class="supported-stores">
                 <span class="store-badge snitch">Snitch</span>
                 <span class="store-badge fashionnova">Fashion Nova</span>
@@ -40,9 +41,9 @@
         <!-- Input Section -->
         <div class="glass-card input-section">
             <label for="url-input" class="input-label">Product URLs <span class="hint">(one per line)</span></label>
-            <textarea 
-                id="url-input" 
-                placeholder="https://www.snitch.com/men-shirts/lining-maroon-shirt/7355129528482/buy&#10;https://www.fashionnova.com/products/carina-snatched-pant-set-black&#10;https://www.libas.in/products/peach-self-design-silk-blend-straight-suit-set-33549o"
+            <textarea
+                id="url-input"
+                placeholder="Paste any product URL here (one per line)&#10;https://www.example.com/products/some-product&#10;https://www.anotherstore.com/products/another-product"
                 rows="5"
             ></textarea>
             <div class="button-row">
