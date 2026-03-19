@@ -1,11 +1,15 @@
-Product,Unit,Section,Size,Across Shoulder,Bust,Hips,Waist,Front Length,Outseam Length,Inseam Length
-Rust Printed Cotton Night Suit,cm,TOP,S,36.8,96.5,106.7,86.4,76.2,,
-Rust Printed Cotton Night Suit,cm,TOP,M,38.1,101.6,111.8,91.4,76.2,,
-Rust Printed Cotton Night Suit,cm,TOP,L,39.4,106.7,116.8,96.5,76.2,,
-Rust Printed Cotton Night Suit,cm,TOP,XL,40.6,111.8,121.9,101.6,76.2,,
-Rust Printed Cotton Night Suit,cm,TOP,XXL,41.9,116.8,127.0,106.7,76.2,,
-Rust Printed Cotton Night Suit,cm,BOTTOM,S,,,,76.2,,96.5,66.0
-Rust Printed Cotton Night Suit,cm,BOTTOM,M,,,,78.7,,96.5,66.0
-Rust Printed Cotton Night Suit,cm,BOTTOM,L,,,,78.7,,96.5,66.0
-Rust Printed Cotton Night Suit,cm,BOTTOM,XL,,,,81.3,,96.5,66.0
-Rust Printed Cotton Night Suit,cm,BOTTOM,XXL,,,,81.3,,96.5,66.0
+Product,Unit,Section,Size,Chest,Waist,Hip,Shoulder,Armhole,Sleeve Length,Front Length,Side Length,Thigh,Length
+Orange Embroidered Chanderi Kurta with Pants- Set of 2,cm,Kurta,XXS,76,61-79,84-99,36,43,46,107,117,,
+Orange Embroidered Chanderi Kurta with Pants- Set of 2,cm,Kurta,XS,81,66-84,89-104,37,44,46,107,117,,
+Orange Embroidered Chanderi Kurta with Pants- Set of 2,cm,Kurta,S,86,71-89,94-109,38,46,46,107,117,,
+Orange Embroidered Chanderi Kurta with Pants- Set of 2,cm,Kurta,M,91,76-94,99-114,39,47,46,107,117,,
+Orange Embroidered Chanderi Kurta with Pants- Set of 2,cm,Kurta,L,99,84-102,107-122,41,48,46,107,117,,
+Orange Embroidered Chanderi Kurta with Pants- Set of 2,cm,Kurta,XL,104,89-107,112-127,42,50,46,107,117,,
+Orange Embroidered Chanderi Kurta with Pants- Set of 2,cm,Kurta,XXL,109,94-112,117-132,43,51,46,107,117,,
+Orange Embroidered Chanderi Kurta with Pants- Set of 2,cm,Pants,XXS,,66,107,,,,,,58,97
+Orange Embroidered Chanderi Kurta with Pants- Set of 2,cm,Pants,XS,,71,112,,,,,,61,97
+Orange Embroidered Chanderi Kurta with Pants- Set of 2,cm,Pants,S,,76,117,,,,,,64,97
+Orange Embroidered Chanderi Kurta with Pants- Set of 2,cm,Pants,M,,81,122,,,,,,66,97
+Orange Embroidered Chanderi Kurta with Pants- Set of 2,cm,Pants,L,,86,127,,,,,,69,99
+Orange Embroidered Chanderi Kurta with Pants- Set of 2,cm,Pants,XL,,91,132,,,,,,71,99
+Orange Embroidered Chanderi Kurta with Pants- Set of 2,cm,Pants,XXL,,97,137,,,,,,74,99
