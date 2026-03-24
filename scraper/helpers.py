@@ -1,7 +1,36 @@
 """Shared helper functions used by both store-specific and universal scrapers."""
 
 import re
-from .config import INCH_TO_CM
+from .config import HEADERS, INCH_TO_CM, BROWSER_ARGS
+
+
+async def launch_browser():
+    """Launch a stealth Chromium browser with anti-bot args."""
+    from playwright.async_api import async_playwright
+    pw = await async_playwright().start()
+    browser = await pw.chromium.launch(headless=True, args=BROWSER_ARGS)
+    return pw, browser
+
+
+async def create_stealth_context(browser, locale="en-US"):
+    """Create a browser context with anti-bot stealth settings."""
+    ctx = await browser.new_context(
+        user_agent=HEADERS["User-Agent"],
+        viewport={"width": 1920, "height": 1080},
+        locale=locale,
+    )
+    await ctx.add_init_script(
+        'Object.defineProperty(navigator, "webdriver", { get: () => false });'
+    )
+    return ctx
+
+
+async def cleanup_browser(page, ctx, pw):
+    """Close page, context, and optionally playwright instance."""
+    await page.close()
+    await ctx.close()
+    if pw:
+        await pw.stop()
 
 
 async def _wait_for(page, js_condition: str, timeout: int = 8000, interval: int = 400):

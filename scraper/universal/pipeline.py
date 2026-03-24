@@ -11,13 +11,16 @@ Flow:
   7. Build DataFrame, compute confidence
 """
 
+import logging
+
 import pandas as pd
-from ..config import HEADERS
-from ..helpers import _wait_for, get_product_title
+from ..helpers import _wait_for, get_product_title, launch_browser, create_stealth_context
 from .discovery import discover_size_chart, try_cm_toggle
 from .extraction import extract_tables, extract_text_content, pick_best_table, parse_table_data, parse_text_as_table
 from .normalization import detect_unit, convert_to_cm, build_dataframe
 from .confidence import compute_confidence
+
+log = logging.getLogger(__name__)
 
 
 async def scrape_universal(product_url: str, browser=None) -> tuple:
@@ -30,23 +33,12 @@ async def scrape_universal(product_url: str, browser=None) -> tuple:
     own_browser = browser is None
     pw = None
     if own_browser:
-        from playwright.async_api import async_playwright
-        pw = await async_playwright().start()
-        browser = await pw.chromium.launch(
-            headless=True,
-            args=["--disable-blink-features=AutomationControlled", "--no-sandbox"],
-        )
+        pw, browser = await launch_browser()
 
-    # Create page with stealth settings to bypass bot detection
-    ctx = await browser.new_context(
-        user_agent=HEADERS["User-Agent"],
-        viewport={"width": 1920, "height": 1080},
-        locale="en-US",
-    )
-    await ctx.add_init_script('Object.defineProperty(navigator, "webdriver", { get: () => false });')
+    ctx = await create_stealth_context(browser)
     page = await ctx.new_page()
     try:
-        print(f"  [universal] Loading page...")
+        log.info("[universal] Loading page...")
         await page.goto(product_url, wait_until="domcontentloaded", timeout=30000)
 
         # Wait for page to be interactive
@@ -86,27 +78,27 @@ async def scrape_universal(product_url: str, browser=None) -> tuple:
         # Get product title (use current URL in case of redirect)
         current_url = page.url
         title = await get_product_title(page, current_url)
-        print(f"  [universal] Product: {title}")
+        log.info("[universal] Product: %s", title)
 
         # Step 1: Discovery — find and reveal the size chart
-        print(f"  [universal] Discovering size chart...")
+        log.info("[universal] Discovering size chart...")
         discovery_result = await discover_size_chart(page)
-        print(f"  [universal] Discovery: {discovery_result}")
+        log.info("[universal] Discovery: %s", discovery_result)
 
         if discovery_result == "not_found":
-            print(f"  [universal] No size chart found on page")
+            log.info("[universal] No size chart found on page")
             return pd.DataFrame(), 0.0
 
         # Step 2: Try CM toggle before extracting
         cm_toggled = await try_cm_toggle(page)
         if cm_toggled:
-            print(f"  [universal] Clicked CM toggle")
+            log.info("[universal] Clicked CM toggle")
             # Wait for table to update
             await page.wait_for_timeout(500)
 
         # Step 3: Extract tables
         tables = await extract_tables(page, discovery_result)
-        print(f"  [universal] Found {len(tables)} candidate table(s)")
+        log.info("[universal] Found %d candidate table(s)", len(tables))
 
         headers = []
         data_rows = []
@@ -117,16 +109,16 @@ async def scrape_universal(product_url: str, browser=None) -> tuple:
             best = pick_best_table(tables)
             if best:
                 headers, data_rows, orientation = parse_table_data(best)
-                print(f"  [universal] Best table: {len(data_rows)} rows, {len(headers)} cols, orientation={orientation}")
+                log.info("[universal] Best table: %d rows, %d cols, orientation=%s", len(data_rows), len(headers), orientation)
 
         # Step 4: If no HTML table found, try text-based extraction
         if not data_rows:
-            print(f"  [universal] No HTML table, trying text extraction...")
+            log.info("[universal] No HTML table, trying text extraction...")
             text = await extract_text_content(page)
             if text:
                 headers, data_rows = parse_text_as_table(text)
                 if data_rows:
-                    print(f"  [universal] Text extraction: {len(data_rows)} rows")
+                    log.info("[universal] Text extraction: %d rows", len(data_rows))
 
         # Get page text for unit detection
         page_text = await page.evaluate("() => document.body.innerText")
@@ -140,13 +132,13 @@ async def scrape_universal(product_url: str, browser=None) -> tuple:
                 await pw.stop()
 
     if not data_rows:
-        print(f"  [universal] No size chart data extracted")
+        log.info("[universal] No size chart data extracted")
         return pd.DataFrame(), 0.0
 
     # Step 5: Detect units and convert
     # Always run detection on actual data — CM toggle may not have worked
     unit = detect_unit(page_text, headers, data_rows)
-    print(f"  [universal] Detected unit: {unit}")
+    log.info("[universal] Detected unit: %s", unit)
 
     data_rows = convert_to_cm(data_rows, headers, unit)
 
@@ -155,6 +147,6 @@ async def scrape_universal(product_url: str, browser=None) -> tuple:
 
     # Step 7: Compute confidence
     confidence = compute_confidence(headers, data_rows, unit, discovery_result)
-    print(f"  [universal] Confidence: {confidence}")
+    log.info("[universal] Confidence: %.2f", confidence)
 
     return df, confidence

@@ -1,44 +1,10 @@
-version: "3.8"
-
 services:
-  backend:
-    build: ./backend
+  scraper:
+    build: .
     ports:
       - "8000:8000"
-    environment:
-      BROWSER_SERVICE_URL: http://browser:3000
-      PORT: "8000"
-    depends_on:
-      browser:
-        condition: service_healthy
+    restart: unless-stopped
     deploy:
       resources:
         limits:
-          memory: 1G
-    restart: unless-stopped
-    networks:
-      - scraper-net
-
-  browser:
-    build: ./browser-service
-    environment:
-      MAX_BROWSERS: "2"
-      RECYCLE_AFTER: "100"
-      PORT: "3000"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-    restart: unless-stopped
-    networks:
-      - scraper-net
-
-networks:
-  scraper-net:
-    driver: bridge
+          memory: 2G

@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.env
+size_chart_data/
+*.tmp

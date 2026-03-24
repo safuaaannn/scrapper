@@ -1,18 +1,17 @@
 """Libas store scraper."""
 
 import pandas as pd
-from ..config import HEADERS
-from ..helpers import _wait_for, _click_and_wait
+from ..helpers import _wait_for, _click_and_wait, launch_browser, create_stealth_context
 
 
 async def scrape_libas(product_url: str, browser=None) -> pd.DataFrame:
     own_browser = browser is None
+    pw = None
     if own_browser:
-        from playwright.async_api import async_playwright
-        pw = await async_playwright().start()
-        browser = await pw.chromium.launch(headless=True)
+        pw, browser = await launch_browser()
 
-    page = await browser.new_page(user_agent=HEADERS["User-Agent"])
+    ctx = await create_stealth_context(browser, locale="en-IN")
+    page = await ctx.new_page()
     try:
         await page.goto(product_url, wait_until="domcontentloaded", timeout=30000)
         await _wait_for(page, """() => {
@@ -54,9 +53,11 @@ async def scrape_libas(product_url: str, browser=None) -> pd.DataFrame:
         text = await page.evaluate("() => document.body.innerText")
     finally:
         await page.close()
+        await ctx.close()
         if own_browser:
             await browser.close()
-            await pw.stop()
+            if pw:
+                await pw.stop()
 
     return _parse_libas_text(text, product_url, title)
 

@@ -114,10 +114,10 @@ FIND_BY_ATTRS_JS = """() => {
     const candidates = [];
 
     for (const el of document.querySelectorAll('*')) {
-        const attrs = (el.className || '') + ' ' + (el.id || '');
+        let attrs = (el.className || '') + ' ' + (el.id || '');
         for (const attr of el.attributes) {
             if (attr.name.startsWith('data-')) {
-                attrs + ' ' + attr.value;
+                attrs += ' ' + attr.value;
             }
         }
         const lower = attrs.toLowerCase();

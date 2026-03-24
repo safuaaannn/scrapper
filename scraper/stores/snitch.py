@@ -7,27 +7,17 @@ response for reliable structured data, with DOM text parsing as fallback.
 
 import json
 import pandas as pd
-from ..config import HEADERS, INCH_TO_CM
-from ..helpers import _wait_for
+from ..config import INCH_TO_CM
+from ..helpers import _wait_for, launch_browser, create_stealth_context
 
 
 async def scrape_snitch(product_url: str, browser=None) -> pd.DataFrame:
     own_browser = browser is None
     pw = None
     if own_browser:
-        from playwright.async_api import async_playwright
-        pw = await async_playwright().start()
-        browser = await pw.chromium.launch(
-            headless=True,
-            args=["--disable-blink-features=AutomationControlled", "--no-sandbox"],
-        )
+        pw, browser = await launch_browser()
 
-    ctx = await browser.new_context(
-        user_agent=HEADERS["User-Agent"],
-        viewport={"width": 1920, "height": 1080},
-        locale="en-IN",
-    )
-    await ctx.add_init_script('Object.defineProperty(navigator, "webdriver", { get: () => false });')
+    ctx = await create_stealth_context(browser, locale="en-IN")
     page = await ctx.new_page()
 
     # Capture size-chart API responses

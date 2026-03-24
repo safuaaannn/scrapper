@@ -11,6 +11,9 @@ INCH_TO_CM = 2.54
 MAX_PARALLEL = 4
 OUTPUT_DIR = "./size_chart_data"
 
+# Browser launch args for anti-bot stealth
+BROWSER_ARGS = ["--disable-blink-features=AutomationControlled", "--no-sandbox"]
+
 # Keywords that indicate a size chart trigger element
 TRIGGER_KEYWORDS = [
     "size chart", "size guide", "sizing guide", "sizing chart",

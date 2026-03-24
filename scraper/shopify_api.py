@@ -7,7 +7,7 @@ size chart data embedded in the product body HTML.
 
 import re
 import pandas as pd
-from .config import HEADERS
+from .helpers import launch_browser, create_stealth_context
 
 
 async def try_shopify_api(product_url: str, browser=None) -> tuple:
@@ -15,8 +15,6 @@ async def try_shopify_api(product_url: str, browser=None) -> tuple:
     Try to fetch size chart from Shopify's product JSON API.
     Returns (pd.DataFrame, float confidence) or (empty DataFrame, 0.0).
     """
-    # Extract the JSON URL
-    # Shopify URLs: /products/<handle> or /products/<handle>?variant=...
     if "/products/" not in product_url:
         return pd.DataFrame(), 0.0
 
@@ -27,11 +25,10 @@ async def try_shopify_api(product_url: str, browser=None) -> tuple:
     own_browser = browser is None
     pw = None
     if own_browser:
-        from playwright.async_api import async_playwright
-        pw = await async_playwright().start()
-        browser = await pw.chromium.launch(headless=True)
+        pw, browser = await launch_browser()
 
-    page = await browser.new_page(user_agent=HEADERS["User-Agent"])
+    ctx = await create_stealth_context(browser)
+    page = await ctx.new_page()
     try:
         response = await page.goto(json_url, wait_until="domcontentloaded", timeout=15000)
         if not response or response.status != 200:
@@ -65,6 +62,7 @@ async def try_shopify_api(product_url: str, browser=None) -> tuple:
         return pd.DataFrame(), 0.0
     finally:
         await page.close()
+        await ctx.close()
         if own_browser:
             await browser.close()
             if pw:
