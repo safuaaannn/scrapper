@@ -44,7 +44,10 @@ def api_scrape():
     async def run_all():
         from playwright.async_api import async_playwright
         async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
+            browser = await p.chromium.launch(
+                headless=True,
+                args=["--disable-blink-features=AutomationControlled", "--no-sandbox"],
+            )
             clean_urls = [u.strip() for u in urls if u.strip()]
             task_results = await asyncio.gather(
                 *[scrape_url(u, browser=browser) for u in clean_urls],

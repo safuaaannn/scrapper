@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Size Chart Scraper</title>
+    <meta name="description" content="Universal size chart scraper. Paste any product URL and get size data in CM.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Animated background blobs -->
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <div class="bg-blob blob-3"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">📐</span>
+                <h1>Size Chart Scraper</h1>
+            </div>
+            <p class="subtitle">Paste any Shopify product URL — extracts size charts via 7 detection methods</p>
+            <p class="subtitle-hint">Static-first (fast), headless fallback for JS-rendered apps. Optimized for:</p>
+            <div class="supported-stores">
+                <span class="store-badge snitch">Snitch</span>
+                <span class="store-badge fashionnova">Fashion Nova</span>
+                <span class="store-badge libas">Libas</span>
+                <span class="store-badge rarerabbit">Rare Rabbit</span>
+                <span class="store-badge gymshark">Gymshark</span>
+                <span class="store-badge bombayshirts">Bombay Shirts</span>
+                <span class="store-badge theloom">The Loom</span>
+                <span class="store-badge outdoorvoices">Outdoor Voices</span>
+                <span class="store-badge goodamerican">Good American</span>
+            </div>
+        </header>
+
+        <!-- Input Section -->
+        <div class="glass-card input-section">
+            <label for="url-input" class="input-label">Product URLs <span class="hint">(one per line)</span></label>
+            <textarea
+                id="url-input"
+                placeholder="Paste any product URL here (one per line)&#10;https://www.example.com/products/some-product&#10;https://www.anotherstore.com/products/another-product"
+                rows="5"
+            ></textarea>
+            <div class="options-row">
+                <label class="toggle-label" for="ocr-toggle" title="Use GPU-powered OCR (DETR + TrOCR) to extract data from size chart images">
+                    <input type="checkbox" id="ocr-toggle">
+                    <span class="toggle-switch"></span>
+                    <span>Image OCR (GPU)</span>
+                </label>
+            </div>
+            <div class="button-row">
+                <button id="scrape-btn" class="btn btn-primary" onclick="startScraping()">
+                    <span class="btn-icon">🚀</span>
+                    <span class="btn-text">Scrape Size Charts</span>
+                </button>
+                <button id="clear-btn" class="btn btn-secondary" onclick="clearAll()">
+                    <span class="btn-icon">🗑️</span>
+                    <span class="btn-text">Clear All</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Status Section -->
+        <div id="status-section" class="status-section" style="display:none;">
+            <div class="glass-card">
+                <div class="status-header">
+                    <div class="spinner" id="spinner"></div>
+                    <span id="status-text">Scraping...</span>
+                </div>
+                <div id="url-statuses"></div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="results-section" style="display:none;">
+            <div class="results-header">
+                <h2>📊 Results</h2>
+                <div class="results-actions">
+                    <button class="btn btn-accent" onclick="downloadCSV()">
+                        <span class="btn-icon">⬇️</span>
+                        <span class="btn-text">Download CSV</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="downloadJSON()">
+                        <span class="btn-icon">⬇️</span>
+                        <span class="btn-text">Download JSON</span>
+                    </button>
+                </div>
+            </div>
+            <div id="results-container"></div>
+        </div>
+
+        <!-- Errors Section -->
+        <div id="errors-section" class="errors-section" style="display:none;">
+            <div class="glass-card error-card">
+                <h3>⚠️ Errors</h3>
+                <ul id="error-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

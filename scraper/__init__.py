@@ -105,7 +105,10 @@ async def main():
     from playwright.async_api import async_playwright
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
+        browser = await p.chromium.launch(
+            headless=True,
+            args=["--disable-blink-features=AutomationControlled", "--no-sandbox"],
+        )
 
         if len(urls) == 1:
             results = [await scrape_url(urls[0], browser=browser)]
