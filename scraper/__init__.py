@@ -18,6 +18,7 @@ import pandas as pd
 
 from .config import OUTPUT_DIR, MAX_PARALLEL, BROWSER_ARGS
 from .helpers import launch_browser
+from .regex_scan import try_regex_scan
 from .stores import STORE_SCRAPERS
 from .universal.pipeline import scrape_universal
 from .shopify_api import try_shopify_api
@@ -57,6 +58,18 @@ async def scrape_url(url: str, browser=None) -> pd.DataFrame:
     Returns a DataFrame with columns: Product, Unit, Size, + measurements.
     """
     store = detect_store(url)
+
+    # Layer 0: Regex fast-scan (no browser, instant)
+    # Works for stores that have a recipe in recipes.py
+    try:
+        df, confidence = await try_regex_scan(url)
+        if not df.empty and confidence >= 0.5:
+            log.info("Regex scan succeeded (confidence: %.2f) — %s", confidence, url)
+            return df
+        elif not df.empty:
+            log.info("Regex scan low confidence (%.2f), trying browser...", confidence)
+    except Exception as e:
+        log.debug("Regex scan skipped: %s", e)
 
     # Layer 1: Known store scraper
     if store in STORE_SCRAPERS:
